@@ -4,15 +4,10 @@ Configuración centralizada para el sistema SAT
 
 # Configuración de conexión a la base de datos
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 3306,
-    'user': 'root',
-    'password': 'Mexico68$',
-    'database': 'sat',
-    'charset': 'utf8mb4',
-    'collation': 'utf8mb4_unicode_ci',
-    'use_unicode': True,
-    'autocommit': True
+    "host": "mysql-sat",
+    "user": "satuser",
+    "password": "satpass",
+    "database": "satdb"
 }
 
 # Rutas de archivos CSV - COMPLETO
@@ -46,3 +41,4 @@ DB_SETTINGS = {
     'collation': 'utf8mb4_unicode_ci',
     'engine': 'InnoDB'
 }
+
