@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Estadísticas - Sistema SAT{% endblock %}
+
+{% block content %}
+<h1><i class="fas fa-chart-pie"></i> Estadísticas del Sistema</h1>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-table"></i> Estadísticas por Tabla</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tabla</th>
+                                <th>Registros</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tabla, total in stats.items() %}
+                            <tr>
+                                <td>{{ tabla }}</td>
+                                <td><span class="badge bg-secondary">{{ total }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Duplicados por RFC</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tabla</th>
+                                <th>Duplicados</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tabla, duplicados in duplicates.items() %}
+                            <tr>
+                                <td>{{ tabla }}</td>
+                                <td><span class="badge bg-danger">{{ duplicados }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Situaciones 69-B</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Situación</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for situacion in situaciones %}
+                            <tr>
+                                <td>{{ situacion.situacion_contribuyente or 'No especificado' }}</td>
+                                <td><span class="badge bg-success">{{ situacion.count }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Últimas Actualizaciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tabla</th>
+                                <th>Última Actualización</th>
+                                <th>Total Registros</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for actualizacion in actualizaciones %}
+                            <tr>
+                                <td>{{ actualizacion.table_name }}</td>
+                                <td>{{ actualizacion.ultima_actualizacion.strftime('%d/%m/%Y %H:%M') if actualizacion.ultima_actualizacion else 'N/A' }}</td>
+                                <td>{{ actualizacion.total_registros }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

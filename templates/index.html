@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Sistema SAT{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1><i class="fas fa-home"></i> Sistema SAT</h1>
+        <p class="lead">Sistema de consulta de contribuyentes del SAT</p>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h4>Total de Registros</h4>
+                <h2>{{ stats.total }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas por tabla -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">Definitivos</h5>
+                <h2>{{ stats.Definitivos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">Desvirtuados</h5>
+                <h2>{{ stats.Desvirtuados }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">Presuntos</h5>
+                <h2>{{ stats.Presuntos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-secondary mb-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">Sentencias Favorables</h5>
+                <h2>{{ stats.SentenciasFavorables }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Situaciones en Listado 69-B</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Situación</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for situacion in situaciones %}
+                            <tr>
+                                <td>{{ situacion.situacion_contribuyente or 'No especificado' }}</td>
+                                <td><span class="badge bg-success">{{ situacion.count }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-clock"></i> Últimas Actualizaciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tabla</th>
+                                <th>Fecha Actualización</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for actualizacion in actualizaciones %}
+                            <tr>
+                                <td>{{ actualizacion.table_name }}</td>
+                                <td>{{ actualizacion.fecha_actualizacion.strftime('%d/%m/%Y %H:%M') if actualizacion.fecha_actualizacion else 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
