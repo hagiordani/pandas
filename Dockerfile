@@ -17,3 +17,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8091
 
 CMD ["python3", "app.py"]
+
