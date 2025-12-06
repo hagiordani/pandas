@@ -6,10 +6,7 @@ services:
     container_name: flask_app
     restart: always
     ports:
-      - "8080:8080"
+      - "8091:8091"
     environment:
       - FLASK_ENV=production
-      - PORT=8090
-    volumes:
-      - .:/app
     command: python3 app.py
