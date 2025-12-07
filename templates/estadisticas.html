@@ -1,125 +1,87 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Estadísticas — Sistema SAT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; background: #f4f6f8; margin: 0; }
+    header, footer { background: #2c3e50; color: white; padding: 15px; text-align: center; }
+    nav { background: #34495e; padding: 10px; text-align: center; }
+    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+    main { padding: 20px; }
+    .box { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 8px; border-bottom: 1px solid #ddd; }
+    th { background: #2c3e50; color: white; }
+  </style>
+</head>
+<body>
 
-{% block title %}Estadísticas - Sistema SAT{% endblock %}
+<header>
+  <h1>Sistema SAT</h1>
+  <p>Estadísticas Detalladas</p>
+</header>
 
-{% block content %}
-<h1><i class="fas fa-chart-pie"></i> Estadísticas del Sistema</h1>
+<nav>
+  <a href="/">Inicio</a>
+  <a href="/search">Buscar</a>
+  <a href="/carga_masiva">Carga Masiva</a>
+  <a href="/estadisticas">Estadísticas</a>
+  <a href="/tablas">Tablas</a>
+</nav>
 
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-table"></i> Estadísticas por Tabla</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Tabla</th>
-                                <th>Registros</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for tabla, total in stats.items() %}
-                            <tr>
-                                <td>{{ tabla }}</td>
-                                <td><span class="badge bg-secondary">{{ total }}</span></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Duplicados por RFC</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Tabla</th>
-                                <th>Duplicados</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for tabla, duplicados in duplicates.items() %}
-                            <tr>
-                                <td>{{ tabla }}</td>
-                                <td><span class="badge bg-danger">{{ duplicados }}</span></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<main>
 
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-list"></i> Situaciones 69-B</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Situación</th>
-                                <th>Cantidad</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for situacion in situaciones %}
-                            <tr>
-                                <td>{{ situacion.situacion_contribuyente or 'No especificado' }}</td>
-                                <td><span class="badge bg-success">{{ situacion.count }}</span></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Últimas Actualizaciones</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Tabla</th>
-                                <th>Última Actualización</th>
-                                <th>Total Registros</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for actualizacion in actualizaciones %}
-                            <tr>
-                                <td>{{ actualizacion.table_name }}</td>
-                                <td>{{ actualizacion.ultima_actualizacion.strftime('%d/%m/%Y %H:%M') if actualizacion.ultima_actualizacion else 'N/A' }}</td>
-                                <td>{{ actualizacion.total_registros }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  <div class="box">
+    <h2>Registros por Tabla</h2>
+    <table>
+      <tr><th>Tabla</th><th>Total</th></tr>
+      {% for tabla, total in stats.items() %}
+      <tr><td>{{ tabla }}</td><td>{{ total }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="box">
+    <h2>Duplicados por RFC</h2>
+    <table>
+      <tr><th>Tabla</th><th>Duplicados</th></tr>
+      {% for tabla, dup in duplicates.items() %}
+      <tr><td>{{ tabla }}</td><td>{{ dup }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="box">
+    <h2>Situaciones en Listado 69-B</h2>
+    <table>
+      <tr><th>Situación</th><th>Total</th></tr>
+      {% for s in situaciones %}
+      <tr><td>{{ s.situacion_contribuyente }}</td><td>{{ s.count }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="box">
+    <h2>Últimas Actualizaciones</h2>
+    <table>
+      <tr><th>Tabla</th><th>Última Fecha</th><th>Total Registros</th></tr>
+      {% for a in actualizaciones %}
+      <tr>
+        <td>{{ a.table_name }}</td>
+        <td>{{ a.ultima_actualizacion }}</td>
+        <td>{{ a.total_registros }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  &copy; {{ now.year }} Sistema SAT — Desarrollado por Hugo
+</footer>
+
+</body>
+</html>
