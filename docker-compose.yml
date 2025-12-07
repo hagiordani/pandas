@@ -1,20 +1,77 @@
 version: "3.9"
 
 services:
-  flask_app:
+
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=admin@hcar.cloud"
+      - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/acme.json:/acme.json"
+    networks:
+      - sat_net
+
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb_sat
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: satdb
+      MYSQL_USER: satuser
+      MYSQL_PASSWORD: satpass123
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - sat_net
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma_sat
+    restart: always
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: satuser
+      PMA_PASSWORD: satpass123
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pma.rule=Host(`pma.hcar.cloud`)"
+      - "traefik.http.routers.pma.entrypoints=websecure"
+      - "traefik.http.routers.pma.tls.certresolver=myresolver"
+    networks:
+      - sat_net
+
+  sat_app:
     build: .
-    container_name: flask_app
+    container_name: sat_app
     restart: always
     volumes:
       - ./uploads:/app/uploads
+    environment:
+      - TZ=America/Mexico_City
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sat.rule=Host(`api.hcar.cloud`)"
       - "traefik.http.routers.sat.entrypoints=websecure"
       - "traefik.http.routers.sat.tls.certresolver=myresolver"
     networks:
-      - traefik
+      - sat_net
 
 networks:
-  traefik:
-    external: true
+  sat_net:
+
+volumes:
+  db_data:
