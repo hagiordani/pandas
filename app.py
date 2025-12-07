@@ -32,6 +32,34 @@ ALLOWED_EXTENSIONS = {'txt'}
 # UTILIDADES
 # ---------------------------------------------------------
 
+@app.route("/")
+def index():
+    tablas = {
+        "labels": ["Definitivos", "Presuntos", "Desvirtuados"],
+        "values": [1200, 800, 450]
+    }
+
+    cargas_dias = {
+        "labels": ["Lun", "Mar", "Mié", "Jue", "Vie"],
+        "values": [10, 25, 18, 30, 22]
+    }
+
+    estados = {
+        "labels": ["Activo", "Suspendido", "Baja"],
+        "values": [70, 20, 10]
+    }
+
+    return render_template(
+        "index.html",
+        total_registros=2450,
+        total_tablas=5,
+        ultima_carga="2025-01-12",
+        procesados_hoy=32,
+        tablas_json=json.dumps(tablas),
+        cargas_dias_json=json.dumps(cargas_dias),
+        estados_json=json.dumps(estados)
+    )
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
