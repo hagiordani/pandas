@@ -1,8 +1,8 @@
 ✅ README.md — Sistema SAT Flask API
-Aplicación web para consulta, análisis y carga masiva de RFCs del SAT Desarrollado en Flask + MySQL + Gunicorn, optimizado para despliegue en EasyPanel.
+Aplicación web para consulta, análisis y carga masiva de RFCs del SAT Desarrollada en Flask + MySQL + Gunicorn, optimizada para despliegue en EasyPanel.
 
 🚀 Características principales
-API y panel web para consultar contribuyentes en:
+Panel web y API REST para consultar contribuyentes en:
 
 Definitivos
 
@@ -24,7 +24,7 @@ Motor de plantillas Jinja2
 
 Conexión MySQL optimizada
 
-Listo para producción con Gunicorn
+Listo para producción con Gunicorn detrás de Traefik
 
 📁 Estructura del proyecto
 Código
@@ -80,7 +80,7 @@ SentenciasFavorables
 
 Listado_Completo_69_B
 
-(Se incluye archivo SQL en /sql/estructura_satdb.sql)
+Archivo recomendado: sql/estructura_satdb.sql
 
 🔧 Variables de entorno
 En EasyPanel → sat-flask-app → Entorno:
