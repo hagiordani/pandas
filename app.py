@@ -312,7 +312,16 @@ def ver_tabla(nombre_tabla):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        tablas_validas = ['definitivos', 'desvirtuados', 'presuntos', 'sentenciasfavorables', 'listado_completo_69_b']
+        tablas_validas = {
+    		'definitivos': 'Definitivos',
+	    	'desvirtuados': 'Desvirtuados',
+		'presuntos': 'Presuntos',
+		'sentenciasfavorables': 'SentenciasFavorables',
+		'listado_completo_69_b': 'Listado_Completo_69_B'
+	}
+	
+	tabla_real = tablas_validas.get(nombre_tabla.lower())
+	
         if nombre_tabla.lower() not in tablas_validas:
             return "Tabla no válida", 400
 
@@ -320,17 +329,18 @@ def ver_tabla(nombre_tabla):
         per_page = 50
         offset = (page - 1) * per_page
 
-        cursor.execute(f"SELECT COUNT(*) AS total FROM {nombre_tabla}")
+       
+	cursor.execute(f"SELECT COUNT(*) AS total FROM {tabla_real}")
         total = cursor.fetchone()['total']
 
         cursor.execute(f"""
-            SELECT * FROM {nombre_tabla}
+            SELECT * FROM {tabla_real}
             ORDER BY numero
             LIMIT %s OFFSET %s
         """, (per_page, offset))
         registros = cursor.fetchall()
 
-        cursor.execute(f"DESCRIBE {nombre_tabla}")
+	cursor.execute(f"DESCRIBE {tabla_real}")
         columnas = [col['Field'] for col in cursor.fetchall()]
 
         total_pages = (total + per_page - 1) // per_page
@@ -375,11 +385,21 @@ def exportar_tabla(nombre_tabla):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        tablas_validas = ['definitivos', 'desvirtuados', 'presuntos', 'sentenciasfavorables', 'listado_completo_69_b']
+        tablas_validas = {
+    		'definitivos': 'Definitivos',
+    		'desvirtuados': 'Desvirtuados',
+    		'presuntos': 'Presuntos',
+    		'sentenciasfavorables': 'SentenciasFavorables',
+    		'listado_completo_69_b': 'Listado_Completo_69_B'
+	}
+
+	tabla_real = tablas_validas.get(nombre_tabla.lower())
+
+
         if nombre_tabla.lower() not in tablas_validas:
             return "Tabla no válida", 400
 
-        cursor.execute(f"SELECT * FROM {nombre_tabla} ORDER BY numero")
+        cursor.execute(f"SELECT * FROM {tabla_real} ORDER BY numero")
         registros = cursor.fetchall()
 
         output = io.StringIO()
@@ -430,13 +450,15 @@ def carga_csv():
             return redirect(request.url)
 
         tabla = request.form.get('tabla')
-        tablas_validas = [
-            'Definitivos',
-            'Desvirtuados',
-            'Presuntos',
-            'SentenciasFavorables',
-            'Listado_Completo_69_B'
-        ]
+        tablas_validas = {
+    		'definitivos': 'Definitivos',
+		'desvirtuados': 'Desvirtuados',
+    		'presuntos': 'Presuntos',
+    		'sentenciasfavorables': 'SentenciasFavorables',
+		'listado_completo_69_b': 'Listado_Completo_69_B'
+	}
+	tabla_real = tablas_validas.get(nombre_tabla.lower())
+
 
         if tabla not in tablas_validas:
             flash('Tabla destino no válida', 'danger')
@@ -452,7 +474,7 @@ def carga_csv():
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
-            cursor.execute(f"DESCRIBE {tabla}")
+            cursor.execute(f"DESCRIBE {tabla_real}")
             columnas_tabla = [col['Field'] for col in cursor.fetchall()]
 
             columnas_validas = [c for c in df.columns if c in columnas_tabla]
@@ -502,34 +524,8 @@ def historial_cargas():
 
     cursor.execute("SELECT * FROM Historial_Cargas ORDER BY fecha DESC LIMIT 200")
     cargas = cursor.fetchall()
-    cursor.execute("""
-        INSERT INTO Historial_Cargas (nombre_archivo, tabla, registros)
-        VALUES (%s, %s, %s)
-    """, (archivo.filename, tabla, total))
-    conn.commit()
-
 
     cursor.close()
     conn.close()
 
     return render_template('historial_cargas.html', cargas=cargas)
-
-@app.route('/carga_masiva', methods=['GET', 'POST'])
-def carga_masiva():
-    if request.method == 'POST':
-        archivo = request.files.get('archivo')
-        nombre_reporte = request.form.get('nombre_reporte', 'reporte')
-
-        if not archivo or archivo.filename == '':
-            flash(('danger', 'No seleccionaste ningún archivo'))
-            return redirect(request.url)
-
-        # Leer líneas del TXT
-        contenido = archivo.read().decode('latin1').splitlines()
-        rfcs = [line.strip().upper() for line in contenido if line.strip()]
-
-        # Aquí puedes procesar los RFCs como quieras
-        flash(('success', f'Se procesaron {len(rfcs)} RFCs correctamente'))
-        return redirect('/carga_masiva')
-
-    return render_template('carga_masiva.html')
