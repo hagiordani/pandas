@@ -24,8 +24,10 @@ def cargar_csv(tabla, ruta_csv):
         df = pd.read_csv(
             ruta_csv,
             skiprows=IMPORT_CONFIG['skip_rows'],
-            encoding=IMPORT_CONFIG['encoding']
+            encoding='latin1',
+            on_bad_lines='skip'
         )
+
 
         if df.empty:
             print("⚠️ CSV vacío, se omite.")
