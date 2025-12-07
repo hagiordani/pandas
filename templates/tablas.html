@@ -1,20 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Tablas Disponibles</h1>
+<h1 class="mb-4">Tablas Disponibles</h1>
 
-<div class="card">
-  <table>
-    <tr><th>Tabla</th><th>Descripción</th><th>Ver</th></tr>
-
-    {% for t in tablas %}
-    <tr>
-      <td>{{ t.nombre }}</td>
-      <td>{{ t.descripcion }}</td>
-      <td><a class="btn" href="/tabla/{{ t.ruta }}">Ver</a></td>
-    </tr>
-    {% endfor %}
-  </table>
+<div class="card p-4 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>Tabla</th>
+          <th>Descripción</th>
+          <th>Ver</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tablas %}
+        <tr>
+          <td>{{ t.nombre }}</td>
+          <td>{{ t.descripcion }}</td>
+          <td>
+            <a class="btn btn-primary btn-sm" href="/tabla/{{ t.ruta }}">Ver</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 {% endblock %}
