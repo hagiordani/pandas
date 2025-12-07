@@ -1,74 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Búsqueda — Sistema SAT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; }
-    header, footer { background: #2c3e50; color: white; padding: 15px; text-align: center; }
-    nav { background: #34495e; padding: 10px; text-align: center; }
-    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
-    main { padding: 20px; }
-    .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 8px; border-bottom: 1px solid #ddd; }
-    th { background: #2c3e50; color: white; }
-  </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
 
-<header>
-  <h1>Sistema SAT</h1>
-  <p>Búsqueda de Contribuyentes</p>
-</header>
+<h1>Búsqueda de Contribuyentes</h1>
 
-<nav>
-  <a href="/">Inicio</a>
-  <a href="/search">Buscar</a>
-  <a href="/carga_masiva">Carga Masiva</a>
-  <a href="/estadisticas">Estadísticas</a>
-  <a href="/tablas">Tablas</a>
-</nav>
+<div class="card">
+  <form method="GET">
+    <label>Buscar por:</label>
+    <select name="type">
+      <option value="rfc" {% if search_type == 'rfc' %}selected{% endif %}>RFC</option>
+      <option value="nombre" {% if search_type == 'nombre' %}selected{% endif %}>Nombre</option>
+    </select>
 
-<main>
-  <div class="box">
-    <h2>Buscar RFC o Nombre</h2>
+    <input type="text" name="q" value="{{ query }}" placeholder="RFC o nombre" required>
+    <button class="btn">Buscar</button>
+  </form>
+</div>
 
-    <form method="get">
-      <input type="text" name="q" value="{{ query }}" placeholder="RFC o nombre" style="padding:10px;width:60%;">
-      <select name="type" style="padding:10px;">
-        <option value="rfc" {% if search_type=='rfc' %}selected{% endif %}>RFC</option>
-        <option value="nombre" {% if search_type=='nombre' %}selected{% endif %}>Nombre</option>
-      </select>
-      <button type="submit" style="padding:10px 20px;">Buscar</button>
-    </form>
+{% if results %}
+<div class="card">
+  <h2>Resultados ({{ results_count }})</h2>
 
-    {% if results %}
-      <h3>Resultados ({{ results_count }})</h3>
-      <table>
-        <tr>
-          <th>RFC</th>
-          <th>Nombre</th>
-          <th>Situación</th>
-          <th>Tabla Origen</th>
-        </tr>
-        {% for r in results %}
-        <tr>
-          <td>{{ r.rfc }}</td>
-          <td>{{ r.nombre_contribuyente }}</td>
-          <td>{{ r.situacion_contribuyente }}</td>
-          <td>{{ r.tabla_origen }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    {% endif %}
-  </div>
-</main>
+  <table>
+    <tr>
+      <th>RFC</th>
+      <th>Nombre</th>
+      <th>Tabla</th>
+      <th>Número</th>
+    </tr>
 
-<footer>
-  &copy; {{ now.year }} Sistema SAT — Desarrollado por Hugo
-</footer>
+    {% for r in results %}
+    <tr>
+      <td>{{ r.rfc }}</td>
+      <td>{{ r.nombre_contribuyente }}</td>
+      <td>{{ r.tabla_origen }}</td>
+      <td>{{ r.numero }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
 
-</body>
-</html>
+{% endblock %}
