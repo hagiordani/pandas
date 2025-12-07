@@ -7,6 +7,10 @@
   <form method="GET">
     <label>Buscar por:</label>
     <select name="type">
+
+      rfc = request.form['rfc'].strip().upper()
+      nombre = request.form['nombre'].strip().upper()
+
       <option value="rfc" {% if search_type == 'rfc' %}selected{% endif %}>RFC</option>
       <option value="nombre" {% if search_type == 'nombre' %}selected{% endif %}>Nombre</option>
     </select>
