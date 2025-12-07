@@ -27,7 +27,10 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 ALLOWED_EXTENSIONS = {'txt'}
 
 @app.route('/')
-def index():
+
+# hag def index():
+
+def index_page():
     return render_template('index.html')
 
 
