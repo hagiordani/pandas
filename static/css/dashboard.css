@@ -12,7 +12,6 @@ body.dark-mode {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-
 h1, h2, h3, h4 {
     font-weight: 600;
     color: #0d1b2a;
@@ -132,6 +131,7 @@ a {
 .form-label {
     font-weight: 500;
 }
+
 /* ================================
    TOGGLE ANIMADO (iOS STYLE)
 ================================ */
@@ -173,7 +173,6 @@ a {
     border-radius: 50%;
 }
 
-/* Activado */
 input:checked + .slider {
     background-color: #0d6efd;
 }
@@ -222,8 +221,3 @@ footer {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
-
-
-
-
