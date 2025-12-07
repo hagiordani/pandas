@@ -4,8 +4,6 @@
 <h1>Historial de Cargas</h1>
 
 <div class="card">
-  <h2>Últimas cargas realizadas</h2>
-
   <table>
     <tr>
       <th>ID</th>
@@ -15,13 +13,13 @@
       <th>Fecha</th>
     </tr>
 
-    {% for carga in cargas %}
+    {% for c in cargas %}
     <tr>
-      <td>{{ carga.id }}</td>
-      <td>{{ carga.nombre_archivo }}</td>
-      <td>{{ carga.tabla }}</td>
-      <td>{{ carga.registros }}</td>
-      <td>{{ carga.fecha }}</td>
+      <td>{{ c.id }}</td>
+      <td>{{ c.nombre_archivo }}</td>
+      <td>{{ c.tabla }}</td>
+      <td>{{ c.registros }}</td>
+      <td>{{ c.fecha }}</td>
     </tr>
     {% endfor %}
   </table>
