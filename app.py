@@ -313,24 +313,22 @@ def ver_tabla(nombre_tabla):
 
     try:
         tablas_validas = {
-    		'definitivos': 'Definitivos',
-	    	'desvirtuados': 'Desvirtuados',
-		'presuntos': 'Presuntos',
-		'sentenciasfavorables': 'SentenciasFavorables',
-		'listado_completo_69_b': 'Listado_Completo_69_B'
-	}
-	
-	tabla_real = tablas_validas.get(nombre_tabla.lower())
-	
-        if nombre_tabla.lower() not in tablas_validas:
+            'definitivos': 'Definitivos',
+            'desvirtuados': 'Desvirtuados',
+            'presuntos': 'Presuntos',
+            'sentenciasfavorables': 'SentenciasFavorables',
+            'listado_completo_69_b': 'Listado_Completo_69_B'
+        }
+
+        tabla_real = tablas_validas.get(nombre_tabla.lower())
+        if not tabla_real:
             return "Tabla no válida", 400
 
         page = request.args.get('page', 1, type=int)
         per_page = 50
         offset = (page - 1) * per_page
 
-       
-	cursor.execute(f"SELECT COUNT(*) AS total FROM {tabla_real}")
+        cursor.execute(f"SELECT COUNT(*) AS total FROM {tabla_real}")
         total = cursor.fetchone()['total']
 
         cursor.execute(f"""
@@ -340,7 +338,7 @@ def ver_tabla(nombre_tabla):
         """, (per_page, offset))
         registros = cursor.fetchall()
 
-	cursor.execute(f"DESCRIBE {tabla_real}")
+        cursor.execute(f"DESCRIBE {tabla_real}")
         columnas = [col['Field'] for col in cursor.fetchall()]
 
         total_pages = (total + per_page - 1) // per_page
@@ -358,7 +356,7 @@ def ver_tabla(nombre_tabla):
 
         return render_template(
             'tabla_detalle.html',
-            tabla=nombre_tabla,
+            tabla=tabla_real,
             tabla_info=tabla_info,
             registros=registros,
             columnas=columnas,
@@ -371,6 +369,7 @@ def ver_tabla(nombre_tabla):
         cursor.close()
         conn.close()
         return f"Error: {e}", 500
+
 
 # ---------------------------------------------------------
 # EXPORTAR CSV
@@ -529,3 +528,26 @@ def historial_cargas():
     conn.close()
 
     return render_template('historial_cargas.html', cargas=cargas)
+
+@app.route('/carga_masiva', methods=['GET', 'POST'])
+def carga_masiva():
+    if request.method == 'POST':
+        archivo = request.files.get('archivo')
+        nombre_reporte = request.form.get('nombre_reporte', 'reporte')
+
+        if not archivo or archivo.filename == '':
+            flash(('danger', 'No seleccionaste ningún archivo'))
+            return redirect(request.url)
+
+        try:
+            contenido = archivo.read().decode('latin1').splitlines()
+            rfcs = [line.strip().upper() for line in contenido if line.strip()]
+
+            flash(('success', f'Se procesaron {len(rfcs)} RFCs correctamente'))
+            return redirect('/carga_masiva')
+
+        except Exception as e:
+            flash(('danger', f'Error procesando archivo: {e}'))
+            return redirect('/carga_masiva')
+
+    return render_template('carga_masiva.html')
