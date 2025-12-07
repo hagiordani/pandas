@@ -16,5 +16,7 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8091
 
-CMD ["python3", "app.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8091", "app:app"]
+
+
 
