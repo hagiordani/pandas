@@ -1,1 +1,37 @@
 
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Carga de Archivos CSV</h1>
+
+<div class="card">
+  <h2>Subir archivo CSV</h2>
+  <p>Selecciona un archivo CSV para cargarlo en la base de datos. El archivo debe contener encabezados válidos.</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" enctype="multipart/form-data">
+    <label>Archivo CSV:</label>
+    <input type="file" name="archivo" accept=".csv" required>
+
+    <label>Selecciona la tabla destino:</label>
+    <select name="tabla" required style="padding:10px;width:100%;margin-top:10px;">
+      <option value="">-- Seleccionar tabla --</option>
+      <option value="Definitivos">Definitivos</option>
+      <option value="Desvirtuados">Desvirtuados</option>
+      <option value="Presuntos">Presuntos</option>
+      <option value="SentenciasFavorables">Sentencias Favorables</option>
+      <option value="Listado_Completo_69_B">Listado Completo 69-B</option>
+    </select>
+
+    <button class="btn" type="submit">Cargar CSV</button>
+  </form>
+</div>
+
+{% endblock %}
