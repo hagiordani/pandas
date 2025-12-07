@@ -94,5 +94,58 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<li class="nav-item">
+    <button id="themeToggle" class="btn btn-sm btn-light ms-3">
+        🌙 Modo oscuro
+    </button>
+</li>
+<script>
+    const toggleBtn = document.getElementById('themeToggle');
+
+    // Cargar preferencia guardada
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        toggleBtn.textContent = "☀️ Modo claro";
+        loadDarkCSS();
+    }
+
+    // Evento del botón
+    toggleBtn.addEventListener('click', () => {
+        if (document.body.classList.contains('dark-mode')) {
+            // Cambiar a modo claro
+            document.body.classList.remove('dark-mode');
+            toggleBtn.textContent = "🌙 Modo oscuro";
+            localStorage.setItem('theme', 'light');
+            removeDarkCSS();
+        } else {
+            // Cambiar a modo oscuro
+            document.body.classList.add('dark-mode');
+            toggleBtn.textContent = "☀️ Modo claro";
+            localStorage.setItem('theme', 'dark');
+            loadDarkCSS();
+        }
+    });
+
+    // Cargar CSS oscuro dinámicamente
+    function loadDarkCSS() {
+        if (!document.getElementById('darkCSS')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/static/css/dark.css';
+            link.id = 'darkCSS';
+            document.head.appendChild(link);
+        }
+    }
+
+    // Remover CSS oscuro
+    function removeDarkCSS() {
+        const darkLink = document.getElementById('darkCSS');
+        if (darkLink) {
+            darkLink.remove();
+        }
+    }
+</script>
+
 </body>
 </html>
