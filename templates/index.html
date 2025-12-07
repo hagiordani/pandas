@@ -1,79 +1,3 @@
-{% extends "base.html" %}
-{% block content %}
-
-<h1 class="mb-4">Dashboard General</h1>
-
-<!-- Tarjetas de estadísticas -->
-<div class="row g-4 mb-4">
-
-    <div class="col-md-3">
-        <div class="card p-3 shadow-sm text-center">
-            <div class="display-6 text-primary mb-2"><i class="bi bi-collection"></i></div>
-            <h5>Total de Registros</h5>
-            <h2 class="fw-bold">{{ total_registros }}</h2>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card p-3 shadow-sm text-center">
-            <div class="display-6 text-success mb-2"><i class="bi bi-table"></i></div>
-            <h5>Tablas Disponibles</h5>
-            <h2 class="fw-bold">{{ total_tablas }}</h2>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card p-3 shadow-sm text-center">
-            <div class="display-6 text-warning mb-2"><i class="bi bi-upload"></i></div>
-            <h5>Última Carga</h5>
-            <h2 class="fw-bold">{{ ultima_carga }}</h2>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card p-3 shadow-sm text-center">
-            <div class="display-6 text-danger mb-2"><i class="bi bi-calendar-check"></i></div>
-            <h5>Procesados Hoy</h5>
-            <h2 class="fw-bold">{{ procesados_hoy }}</h2>
-        </div>
-    </div>
-
-</div>
-
-<!-- Gráficas -->
-<div class="row g-4">
-
-    <!-- Gráfica de barras -->
-    <div class="col-md-6">
-        <div class="card p-4 shadow-sm">
-            <h4 class="mb-3">Registros por Tabla</h4>
-            <canvas id="barChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Gráfica de líneas -->
-    <div class="col-md-6">
-        <div class="card p-4 shadow-sm">
-            <h4 class="mb-3">Cargas por Día</h4>
-            <canvas id="lineChart"></canvas>
-        </div>
-    </div>
-
-</div>
-
-<div class="row g-4 mt-1">
-
-    <!-- Gráfica de pastel -->
-    <div class="col-md-6">
-        <div class="card p-4 shadow-sm">
-            <h4 class="mb-3">Distribución de Estados</h4>
-            <canvas id="pieChart"></canvas>
-        </div>
-    </div>
-
-</div>
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -82,64 +6,112 @@
     const cargas_dias = {{ cargas_dias_json | safe }};
     const estados = {{ estados_json | safe }};
 
-    // Colores compatibles con modo claro/oscuro
-    const textColor = document.body.classList.contains('dark-mode') ? '#fff' : '#000';
+    // Instancias globales de las gráficas
+    let barChart, lineChart, pieChart;
 
-    // Gráfica de barras
-    new Chart(document.getElementById('barChart'), {
-        type: 'bar',
-        data: {
-            labels: tablas.labels,
-            datasets: [{
-                label: 'Registros',
-                data: tablas.values,
-                backgroundColor: '#0d6efd'
-            }]
-        },
-        options: {
-            plugins: { legend: { labels: { color: textColor } } },
-            scales: {
-                x: { ticks: { color: textColor } },
-                y: { ticks: { color: textColor } }
+    // Función para obtener colores según el modo
+    function getChartColors() {
+        const dark = document.body.classList.contains('dark-mode');
+
+        return {
+            text: dark ? '#ffffff' : '#000000',
+            grid: dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+            background: dark ? '#2a2b2f' : '#ffffff'
+        };
+    }
+
+    // Crear todas las gráficas
+    function createCharts() {
+        const colors = getChartColors();
+
+        // Gráfica de barras
+        barChart = new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: tablas.labels,
+                datasets: [{
+                    label: 'Registros',
+                    data: tablas.values,
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                plugins: { legend: { labels: { color: colors.text } } },
+                scales: {
+                    x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+                    y: { ticks: { color: colors.text }, grid: { color: colors.grid } }
+                }
             }
-        }
-    });
+        });
 
-    // Gráfica de líneas
-    new Chart(document.getElementById('lineChart'), {
-        type: 'line',
-        data: {
-            labels: cargas_dias.labels,
-            datasets: [{
-                label: 'Cargas',
-                data: cargas_dias.values,
-                borderColor: '#198754',
-                tension: 0.3
-            }]
-        },
-        options: {
-            plugins: { legend: { labels: { color: textColor } } },
-            scales: {
-                x: { ticks: { color: textColor } },
-                y: { ticks: { color: textColor } }
+        // Gráfica de líneas
+        lineChart = new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: cargas_dias.labels,
+                datasets: [{
+                    label: 'Cargas',
+                    data: cargas_dias.values,
+                    borderColor: '#198754',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                plugins: { legend: { labels: { color: colors.text } } },
+                scales: {
+                    x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+                    y: { ticks: { color: colors.text }, grid: { color: colors.grid } }
+                }
             }
-        }
-    });
+        });
 
-    // Gráfica de pastel
-    new Chart(document.getElementById('pieChart'), {
-        type: 'pie',
-        data: {
-            labels: estados.labels,
-            datasets: [{
-                data: estados.values,
-                backgroundColor: ['#0d6efd', '#198754', '#dc3545', '#ffc107', '#6f42c1']
-            }]
-        },
-        options: {
-            plugins: { legend: { labels: { color: textColor } } }
-        }
+        // Gráfica de pastel
+        pieChart = new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: estados.labels,
+                datasets: [{
+                    data: estados.values,
+                    backgroundColor: ['#0d6efd', '#198754', '#dc3545', '#ffc107', '#6f42c1']
+                }]
+            },
+            options: {
+                plugins: { legend: { labels: { color: colors.text } } }
+            }
+        });
+    }
+
+    // Actualizar colores cuando cambia el modo oscuro
+    function updateChartsTheme() {
+        const colors = getChartColors();
+
+        const charts = [barChart, lineChart, pieChart];
+
+        charts.forEach(chart => {
+            if (!chart) return;
+
+            // Actualizar colores de texto y grid
+            if (chart.options.scales) {
+                Object.values(chart.options.scales).forEach(scale => {
+                    scale.ticks.color = colors.text;
+                    scale.grid.color = colors.grid;
+                });
+            }
+
+            // Actualizar leyendas
+            if (chart.options.plugins?.legend?.labels) {
+                chart.options.plugins.legend.labels.color = colors.text;
+            }
+
+            chart.update();
+        });
+    }
+
+    // Crear gráficas al cargar la página
+    createCharts();
+
+    // Detectar cambios del toggle
+    document.getElementById('themeToggle').addEventListener('change', () => {
+        setTimeout(updateChartsTheme, 150);
     });
 </script>
-
-{% endblock %}
