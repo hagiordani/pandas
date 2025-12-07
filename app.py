@@ -513,3 +513,23 @@ def historial_cargas():
     conn.close()
 
     return render_template('historial_cargas.html', cargas=cargas)
+
+@app.route('/carga_masiva', methods=['GET', 'POST'])
+def carga_masiva():
+    if request.method == 'POST':
+        archivo = request.files.get('archivo')
+        nombre_reporte = request.form.get('nombre_reporte', 'reporte')
+
+        if not archivo or archivo.filename == '':
+            flash(('danger', 'No seleccionaste ningún archivo'))
+            return redirect(request.url)
+
+        # Leer líneas del TXT
+        contenido = archivo.read().decode('latin1').splitlines()
+        rfcs = [line.strip().upper() for line in contenido if line.strip()]
+
+        # Aquí puedes procesar los RFCs como quieras
+        flash(('success', f'Se procesaron {len(rfcs)} RFCs correctamente'))
+        return redirect('/carga_masiva')
+
+    return render_template('carga_masiva.html')
