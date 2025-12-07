@@ -88,6 +88,16 @@
          
           <li><strong>{{ update.fecha_actualizacion.strftime('%d/%m/%Y') if update.fecha_actualizacion else 'Sin fecha' }}
 
+          <li>
+                <strong>{{ update.table_name }}:</strong>
+                {% if update.fecha_actualizacion %}
+                    {{ update.fecha_actualizacion.strftime('%d/%m/%Y') }}
+                {% else %}
+                  <em>Sin fecha</em>
+                {% endif %}
+</li>
+
+
         {% endfor %}
       </ul>
     </section>
