@@ -127,3 +127,10 @@ Código
 GET /exportar/<nombre_tabla>
 📄 Licencia
 Uso interno. No redistribuir sin autorización.
+
+## 🚀 Deploy con un clic en EasyPanel
+
+Haz clic en el botón para desplegar automáticamente esta aplicación en tu servidor EasyPanel:
+
+[![Deploy to EasyPanel](https://cdn.easypanel.io/deploy-button.svg)](https://app.easypanel.io/deploy)
+
