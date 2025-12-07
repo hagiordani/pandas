@@ -10,42 +10,27 @@
     {% for category, message in messages %}
       <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
         {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       </div>
     {% endfor %}
   {% endwith %}
 
   <form method="POST" action="/carga_masiva" enctype="multipart/form-data" class="needs-validation" novalidate>
+
     <div class="mb-3">
-      <label for="archivo" class="form-label">Archivo TXT:</label>
-      <input type="file" class="form-control" id="archivo" name="archivo" accept=".txt" required>
+      <label class="form-label">Archivo TXT:</label>
+      <input type="file" class="form-control" name="archivo" accept=".txt" required>
       <div class="invalid-feedback">Por favor selecciona un archivo TXT válido.</div>
     </div>
 
     <div class="mb-3">
-      <label for="nombre_reporte" class="form-label">Nombre del reporte (opcional):</label>
-      <input type="text" class="form-control" id="nombre_reporte" name="nombre_reporte" placeholder="ej: reporte_enero">
+      <label class="form-label">Nombre del reporte (opcional):</label>
+      <input type="text" class="form-control" name="nombre_reporte" placeholder="ej: reporte_enero">
     </div>
 
     <button type="submit" class="btn btn-primary">Procesar</button>
+
   </form>
 </div>
-
-<script>
-  // Bootstrap validation
-  (() => {
-    'use strict';
-    const forms = document.querySelectorAll('.needs-validation');
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  })();
-</script>
 
 {% endblock %}
