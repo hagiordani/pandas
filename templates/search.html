@@ -1,46 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Búsqueda de Contribuyentes</h1>
+<h1 class="mb-4">Búsqueda de Contribuyentes</h1>
 
-<div class="card">
-  <form method="GET">
-    <label>Buscar por:</label>
-    <select name="type">
+<div class="card p-4 shadow-sm mb-4">
+  <form method="GET" class="row g-3">
 
-      rfc = request.form['rfc'].strip().upper()
-      nombre = request.form['nombre'].strip().upper()
+    <div class="col-md-3">
+      <label class="form-label">Buscar por:</label>
+      <select name="type" class="form-select">
+        <option value="rfc" {% if search_type == 'rfc' %}selected{% endif %}>RFC</option>
+        <option value="nombre" {% if search_type == 'nombre' %}selected{% endif %}>Nombre</option>
+      </select>
+    </div>
 
-      <option value="rfc" {% if search_type == 'rfc' %}selected{% endif %}>RFC</option>
-      <option value="nombre" {% if search_type == 'nombre' %}selected{% endif %}>Nombre</option>
-    </select>
+    <div class="col-md-6">
+      <label class="form-label">Valor:</label>
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="RFC o nombre" required>
+    </div>
 
-    <input type="text" name="q" value="{{ query }}" placeholder="RFC o nombre" required>
-    <button class="btn">Buscar</button>
+    <div class="col-md-3 d-flex align-items-end">
+      <button class="btn btn-primary w-100">Buscar</button>
+    </div>
+
   </form>
 </div>
 
 {% if results %}
-<div class="card">
-  <h2>Resultados ({{ results_count }})</h2>
+<div class="card p-4 shadow-sm">
+  <h2 class="h5 mb-3">Resultados ({{ results_count }})</h2>
 
-  <table>
-    <tr>
-      <th>RFC</th>
-      <th>Nombre</th>
-      <th>Tabla</th>
-      <th>Número</th>
-    </tr>
-
-    {% for r in results %}
-    <tr>
-      <td>{{ r.rfc }}</td>
-      <td>{{ r.nombre_contribuyente }}</td>
-      <td>{{ r.tabla_origen }}</td>
-      <td>{{ r.numero }}</td>
-    </tr>
-    {% endfor %}
-  </table>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>RFC</th>
+          <th>Nombre</th>
+          <th>Tabla</th>
+          <th>Número</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td>{{ r.rfc }}</td>
+          <td>{{ r.nombre_contribuyente }}</td>
+          <td>{{ r.tabla_origen }}</td>
+          <td>{{ r.numero }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endif %}
 
