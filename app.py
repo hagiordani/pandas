@@ -45,6 +45,95 @@ def get_db_connection():
 def inject_now():
     return {'now': datetime.now(), 'app_name': 'Sistema SAT'}
 
+@app.route('/carga_csv', methods=['GET', 'POST'])
+def carga_csv():
+    """Carga archivos CSV a una tabla seleccionada"""
+
+    if request.method == 'POST':
+        # Validar archivo
+        if 'archivo' not in request.files:
+            flash('No se seleccionó ningún archivo', 'danger')
+            return redirect(request.url)
+
+        archivo = request.files['archivo']
+
+        if archivo.filename == '':
+            flash('No se seleccionó ningún archivo', 'danger')
+            return redirect(request.url)
+
+        if not archivo.filename.lower().endswith('.csv'):
+            flash('Solo se permiten archivos CSV', 'danger')
+            return redirect(request.url)
+
+        # Validar tabla destino
+        tabla = request.form.get('tabla')
+        tablas_validas = [
+            'Definitivos',
+            'Desvirtuados',
+            'Presuntos',
+            'SentenciasFavorables',
+            'Listado_Completo_69_B'
+        ]
+
+        if tabla not in tablas_validas:
+            flash('Tabla destino no válida', 'danger')
+            return redirect(request.url)
+
+        try:
+            # Leer CSV con pandas
+            df = pd.read_csv(archivo)
+
+            if df.empty:
+                flash('El archivo CSV está vacío', 'danger')
+                return redirect(request.url)
+
+            # Obtener columnas de la tabla destino
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+
+            cursor.execute(f"DESCRIBE {tabla}")
+            columnas_tabla = [col['Field'] for col in cursor.fetchall()]
+
+            # Validar columnas
+            columnas_validas = [c for c in df.columns if c in columnas_tabla]
+
+            if not columnas_validas:
+                flash('El CSV no contiene columnas válidas para esta tabla', 'danger')
+                return redirect(request.url)
+
+            # Filtrar solo columnas válidas
+            df = df[columnas_validas]
+
+            # Reemplazar NaN con None
+            df = df.where(pd.notnull(df), None)
+
+            # Inserción masiva
+            placeholders = ", ".join(["%s"] * len(columnas_validas))
+            columnas_sql = ", ".join(columnas_validas)
+            query = f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})"
+
+            registros = df.values.tolist()
+
+            cursor.executemany(query, registros)
+            conn.commit()
+
+            total = cursor.rowcount
+
+            cursor.close()
+            conn.close()
+
+            flash(f"✅ Se cargaron {total} registros correctamente en la tabla {tabla}", "success")
+            return redirect(request.url)
+
+        except Exception as e:
+            traceback.print_exc()
+            flash(f"Error procesando el archivo: {str(e)}", "danger")
+            return redirect(request.url)
+
+    return render_template('carga_csv.html')
+
+
+
 def buscar_rfc_en_tablas(rfc, cursor):
     tablas = ['Definitivos', 'Desvirtuados', 'Presuntos', 'SentenciasFavorables', 'Listado_Completo_69_B']
     encontradas = []
