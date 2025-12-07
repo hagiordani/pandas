@@ -467,6 +467,13 @@ def carga_csv():
             placeholders = ", ".join(["%s"] * len(columnas_validas))
             columnas_sql = ", ".join(columnas_validas)
             query = f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})"
+            cursor.execute("""
+                INSERT INTO Historial_Cargas (nombre_archivo, tabla, registros)
+                VALUES (%s, %s, %s)
+            """, (archivo.filename, tabla, total))
+            conn.commit()
+
+            
 
             registros = df.values.tolist()
 
@@ -495,6 +502,12 @@ def historial_cargas():
 
     cursor.execute("SELECT * FROM Historial_Cargas ORDER BY fecha DESC LIMIT 200")
     cargas = cursor.fetchall()
+    cursor.execute("""
+        INSERT INTO Historial_Cargas (nombre_archivo, tabla, registros)
+        VALUES (%s, %s, %s)
+    """, (archivo.filename, tabla, total))
+    conn.commit()
+
 
     cursor.close()
     conn.close()
