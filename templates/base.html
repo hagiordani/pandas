@@ -34,9 +34,8 @@
       display: flex;
     }
 
-    /* Sidebar */
     .sidebar {
-      width: 230px;
+      width: 240px;
       background: var(--accent);
       color: white;
       height: 100vh;
@@ -64,11 +63,10 @@
       background: var(--accent-light);
     }
 
-    /* Main content */
     .content {
-      margin-left: 230px;
+      margin-left: 240px;
       padding: 25px;
-      width: calc(100% - 230px);
+      width: calc(100% - 240px);
     }
 
     .card {
@@ -78,11 +76,6 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       margin-bottom: 20px;
       border: 1px solid var(--border);
-    }
-
-    h1, h2, h3 {
-      color: var(--text);
-      font-weight: 500;
     }
 
     table {
@@ -115,24 +108,31 @@
     .btn:hover {
       background: var(--accent-light);
     }
+
+    .alert {
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .alert-danger { background: #e74c3c; color: white; }
+    .alert-success { background: #2ecc71; color: white; }
   </style>
 </head>
 
 <body>
 
-  <!-- Sidebar -->
   <div class="sidebar">
-    <h2>Sistema SAT</h2>
+    <h2>🛡️ Sistema SAT</h2>
     <a href="/">🏠 Inicio</a>
     <a href="/search">🔍 Buscar</a>
-    <a href="/carga_masiva">📤 Carga Masiva</a>
+    <a href="/carga_masiva">📤 Carga TXT</a>
     <a href="/carga_csv">🧩 Carga CSV</a>
     <a href="/estadisticas">📊 Estadísticas</a>
     <a href="/tablas">📁 Tablas</a>
+    <a href="/historial_cargas">📜 Historial de Cargas</a>
   </div>
 
-
-  <!-- Main Content -->
   <div class="content">
     {% block content %}{% endblock %}
   </div>
