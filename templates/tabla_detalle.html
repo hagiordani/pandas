@@ -1,72 +1,37 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ tabla_info.nombre }} — Sistema SAT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial; background: #f4f6f8; margin: 0; }
-    header, footer { background: #2c3e50; color: white; padding: 15px; text-align: center; }
-    nav { background: #34495e; padding: 10px; text-align: center; }
-    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
-    main { padding: 20px; }
-    .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 8px; border-bottom: 1px solid #ddd; }
-    th { background: #2c3e50; color: white; }
-    .pagination { margin-top: 20px; text-align: center; }
-    .pagination a { padding: 8px 12px; margin: 0 5px; background: #34495e; color: white; text-decoration: none; border-radius: 4px; }
-  </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
 
-<header>
-  <h1>{{ tabla_info.nombre }}</h1>
-  <p>{{ tabla_info.descripcion }}</p>
-</header>
+<h1>{{ tabla_info.nombre }}</h1>
+<p>{{ tabla_info.descripcion }}</p>
 
-<nav>
-  <a href="/">Inicio</a>
-  <a href="/search">Buscar</a>
-  <a href="/carga_masiva">Carga Masiva</a>
-  <a href="/estadisticas">Estadísticas</a>
-  <a href="/tablas">Tablas</a>
-</nav>
+<div class="card">
+  <h2>Registros ({{ total }})</h2>
 
-<main>
-  <div class="box">
-    <h2>Registros ({{ total }})</h2>
-
-    <table>
-      <tr>
-        {% for col in columnas %}
-          <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-
-      {% for r in registros %}
-      <tr>
-        {% for col in columnas %}
-          <td>{{ r[col] }}</td>
-        {% endfor %}
-      </tr>
+  <table>
+    <tr>
+      {% for col in columnas %}
+        <th>{{ col }}</th>
       {% endfor %}
-    </table>
+    </tr>
 
-    <div class="pagination">
-      {% if page > 1 %}
-        <a href="?page={{ page - 1 }}">Anterior</a>
-      {% endif %}
-      {% if page < total_pages %}
-        <a href="?page={{ page + 1 }}">Siguiente</a>
-      {% endif %}
-    </div>
+    {% for r in registros %}
+    <tr>
+      {% for col in columnas %}
+        <td>{{ r[col] }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div style="margin-top:20px;">
+    {% if page > 1 %}
+      <a class="btn" href="?page={{ page - 1 }}">Anterior</a>
+    {% endif %}
+
+    {% if page < total_pages %}
+      <a class="btn" href="?page={{ page + 1 }}">Siguiente</a>
+    {% endif %}
   </div>
-</main>
+</div>
 
-<footer>
-  &copy; {{ now.year }} Sistema SAT — Desarrollado por Hugo
-</footer>
-
-</body>
-</html>
+{% endblock %}
