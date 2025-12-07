@@ -1,28 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Historial de Cargas</h1>
+<h1 class="mb-4">Historial de Cargas</h1>
 
-<div class="card">
-  <table>
-    <tr>
-      <th>ID</th>
-      <th>Archivo</th>
-      <th>Tabla</th>
-      <th>Registros</th>
-      <th>Fecha</th>
-    </tr>
+<div class="card p-4 shadow-sm">
 
-    {% for c in cargas %}
-    <tr>
-      <td>{{ c.id }}</td>
-      <td>{{ c.nombre_archivo }}</td>
-      <td>{{ c.tabla }}</td>
-      <td>{{ c.registros }}</td>
-      <td>{{ c.fecha }}</td>
-    </tr>
-    {% endfor %}
-  </table>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>ID</th>
+          <th>Archivo</th>
+          <th>Tabla</th>
+          <th>Registros</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in cargas %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.nombre_archivo }}</td>
+          <td>{{ c.tabla }}</td>
+          <td>{{ c.registros }}</td>
+          <td>{{ c.fecha }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
 </div>
 
 {% endblock %}
