@@ -4,7 +4,7 @@ Configuración centralizada para el sistema SAT
 
 # Configuración de conexión a la base de datos
 DB_CONFIG = {
-    "host": "mariadb",
+    "host": "mysql-sat",
     "user": "satuser",
     "password": "satpass123",
     "database": "satdb"
@@ -42,5 +42,6 @@ DB_SETTINGS = {
     'collation': 'utf8mb4_unicode_ci',
     'engine': 'InnoDB'
 }
+
 
 
