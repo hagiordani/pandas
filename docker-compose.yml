@@ -5,8 +5,16 @@ services:
     build: .
     container_name: flask_app
     restart: always
-    ports:
-      - "8091:8091"
-    environment:
-      - FLASK_ENV=production
-    command: python3 app.py
+    volumes:
+      - ./uploads:/app/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sat.rule=Host(`api.hcar.cloud`)"
+      - "traefik.http.routers.sat.entrypoints=websecure"
+      - "traefik.http.routers.sat.tls.certresolver=myresolver"
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
