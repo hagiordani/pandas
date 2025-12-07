@@ -85,7 +85,9 @@
       <h2>Últimas Actualizaciones</h2>
       <ul>
         {% for update in actualizaciones %}
-          <li><strong>{{ update.table_name }}:</strong> {{ update.fecha_actualizacion.strftime('%d/%m/%Y') }}</li>
+         
+          <li><strong>{{ update.fecha_actualizacion.strftime('%d/%m/%Y') if update.fecha_actualizacion else 'Sin fecha' }}
+
         {% endfor %}
       </ul>
     </section>
