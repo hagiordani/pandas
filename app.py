@@ -132,6 +132,8 @@ def search():
     if not query:
         return render_template('search.html', results=[], query='', search_type=search_type)
 
+    query = query.upper()  # Normalizamos a mayúsculas
+
     conn = get_db_connection()
     if not conn:
         return "Error de conexión a la base de datos", 500
@@ -147,17 +149,17 @@ def search():
                 cursor.execute(f"""
                     SELECT *, '{tabla}' AS tabla_origen
                     FROM {tabla}
-                    WHERE rfc = %s
+                    WHERE UPPER(rfc) = %s
                     ORDER BY numero
-                """, (query.upper(),))
+                """, (query,))
                 results.extend(cursor.fetchall())
 
-        else:  # búsqueda por nombre
+        else:  # búsqueda por nombre en mayúsculas
             for tabla in tablas:
                 cursor.execute(f"""
                     SELECT *, '{tabla}' AS tabla_origen
                     FROM {tabla}
-                    WHERE nombre_contribuyente LIKE %s
+                    WHERE UPPER(nombre_contribuyente) LIKE %s
                     ORDER BY numero
                     LIMIT 100
                 """, (f"%{query}%",))
@@ -195,7 +197,7 @@ def api_contribuyente(rfc):
 
     try:
         for tabla in tablas:
-            cursor.execute(f"SELECT * FROM {tabla} WHERE rfc = %s", (rfc.upper(),))
+            cursor.execute(f"SELECT * FROM {tabla} WHERE UPPER(rfc) = %s", (rfc.upper(),))
             for row in cursor.fetchall():
                 row['tabla_origen'] = tabla
                 results.append(row)
@@ -370,7 +372,6 @@ def ver_tabla(nombre_tabla):
         conn.close()
         return f"Error: {e}", 500
 
-
 # ---------------------------------------------------------
 # EXPORTAR CSV
 # ---------------------------------------------------------
@@ -385,17 +386,15 @@ def exportar_tabla(nombre_tabla):
 
     try:
         tablas_validas = {
-    		'definitivos': 'Definitivos',
-    		'desvirtuados': 'Desvirtuados',
-    		'presuntos': 'Presuntos',
-    		'sentenciasfavorables': 'SentenciasFavorables',
-    		'listado_completo_69_b': 'Listado_Completo_69_B'
-	}
+            'definitivos': 'Definitivos',
+            'desvirtuados': 'Desvirtuados',
+            'presuntos': 'Presuntos',
+            'sentenciasfavorables': 'SentenciasFavorables',
+            'listado_completo_69_b': 'Listado_Completo_69_B'
+        }
 
-	tabla_real = tablas_validas.get(nombre_tabla.lower())
-
-
-        if nombre_tabla.lower() not in tablas_validas:
+        tabla_real = tablas_validas.get(nombre_tabla.lower())
+        if tabla_real is None:
             return "Tabla no válida", 400
 
         cursor.execute(f"SELECT * FROM {tabla_real} ORDER BY numero")
@@ -419,7 +418,7 @@ def exportar_tabla(nombre_tabla):
             io.BytesIO(output.getvalue().encode('utf-8')),
             mimetype="text/csv",
             as_attachment=True,
-            download_name=f"{nombre_tabla}_{datetime.now().strftime('%Y%m%d')}.csv"
+            download_name=f"{tabla_real}_{datetime.now().strftime('%Y%m%d')}.csv"
         )
 
     except Exception as e:
@@ -450,16 +449,15 @@ def carga_csv():
 
         tabla = request.form.get('tabla')
         tablas_validas = {
-    		'definitivos': 'Definitivos',
-		'desvirtuados': 'Desvirtuados',
-    		'presuntos': 'Presuntos',
-    		'sentenciasfavorables': 'SentenciasFavorables',
-		'listado_completo_69_b': 'Listado_Completo_69_B'
-	}
-	tabla_real = tablas_validas.get(nombre_tabla.lower())
+            'definitivos': 'Definitivos',
+            'desvirtuados': 'Desvirtuados',
+            'presuntos': 'Presuntos',
+            'sentenciasfavorables': 'SentenciasFavorables',
+            'listado_completo_69_b': 'Listado_Completo_69_B'
+        }
 
-
-        if tabla not in tablas_validas:
+        tabla_real = tablas_validas.get(tabla.lower())
+        if tabla_real is None:
             flash('Tabla destino no válida', 'danger')
             return redirect(request.url)
 
@@ -487,26 +485,25 @@ def carga_csv():
 
             placeholders = ", ".join(["%s"] * len(columnas_validas))
             columnas_sql = ", ".join(columnas_validas)
-            query = f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})"
-            cursor.execute("""
-                INSERT INTO Historial_Cargas (nombre_archivo, tabla, registros)
-                VALUES (%s, %s, %s)
-            """, (archivo.filename, tabla, total))
-            conn.commit()
-
-            
+            query = f"INSERT INTO {tabla_real} ({columnas_sql}) VALUES ({placeholders})"
 
             registros = df.values.tolist()
-
             cursor.executemany(query, registros)
             conn.commit()
 
             total = cursor.rowcount
 
+            # Registrar en historial
+            cursor.execute("""
+                INSERT INTO Historial_Cargas (nombre_archivo, tabla, registros)
+                VALUES (%s, %s, %s)
+            """, (archivo.filename, tabla_real, total))
+            conn.commit()
+
             cursor.close()
             conn.close()
 
-            flash(f"✅ Se cargaron {total} registros correctamente en la tabla {tabla}", "success")
+            flash(f"✅ Se cargaron {total} registros correctamente en la tabla {tabla_real}", "success")
             return redirect(request.url)
 
         except Exception as e:
@@ -516,6 +513,9 @@ def carga_csv():
 
     return render_template('carga_csv.html')
 
+# ---------------------------------------------------------
+# HISTORIAL DE CARGAS
+# ---------------------------------------------------------
 
 @app.route('/historial_cargas')
 def historial_cargas():
@@ -530,6 +530,9 @@ def historial_cargas():
 
     return render_template('historial_cargas.html', cargas=cargas)
 
+# ---------------------------------------------------------
+# CARGA MASIVA TXT
+# ---------------------------------------------------------
 
 @app.route('/carga_masiva', methods=['GET', 'POST'])
 def carga_masiva():
