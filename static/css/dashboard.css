@@ -15,7 +15,9 @@ body.dark-mode {
 
 h1, h2, h3, h4 {
     font-weight: 600;
-    color: #2c3e50;
+    color: #1a1a1a;
+}
+
 }
 
 a {
@@ -173,4 +175,5 @@ footer {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
 
