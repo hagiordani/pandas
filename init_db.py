@@ -1,96 +1,154 @@
 #!/usr/bin/env python3
 """
-Script de inicialización de base de datos SAT
-Carga todos los CSV definidos en config.py
+Script profesional de inicialización de base de datos SAT
+Carga el Listado Completo 69-B y separa automáticamente en:
+- Definitivos
+- Desvirtuados
+- Presuntos
+- Sentencias Favorables
+Además llena la tabla Listado_Completo_69_B
 """
 
 import pandas as pd
 import mysql.connector
 import traceback
-from config import DB_CONFIG, CSV_FILES, IMPORT_CONFIG
+from datetime import datetime
+from config import DB_CONFIG
+
+# ---------------------------------------------------------
+# Mapeo de columnas del CSV → columnas de la base de datos
+# ---------------------------------------------------------
+
+COLUMN_MAP = {
+    "No.": "numero",
+    "RFC": "rfc",
+    "Nombre del Contribuyente": "nombre_contribuyente",
+    "Situación del contribuyente": "situacion_contribuyente",
+    "Situaci�n del contribuyente": "situacion_contribuyente",
+
+    "Número y fecha de oficio global de presunción SAT": "oficio_presuncion_sat",
+    "Publicación página SAT presuntos": "publicacion_sat_presuntos",
+    "Número y fecha de oficio global de presunción DOF": "oficio_presuncion_dof",
+    "Publicación DOF presuntos": "publicacion_dof_presuntos",
+
+    "Número y fecha de oficio global de contribuyentes que desvirtuaron SAT": "oficio_desvirtuado_sat",
+    "Publicación página SAT desvirtuados": "publicacion_sat_desvirtuados",
+    "Número y fecha de oficio global de contribuyentes que desvirtuaron DOF": "oficio_desvirtuado_dof",
+    "Publicación DOF desvirtuados": "publicacion_dof_desvirtuados",
+
+    "Número y fecha de oficio global de definitivos SAT": "oficio_definitivo_sat",
+    "Publicación página SAT definitivos": "publicacion_sat_definitivos",
+    "Número y fecha de oficio global de definitivos DOF": "oficio_definitivo_dof",
+    "Publicación DOF definitivos": "publicacion_dof_definitivos",
+
+    "Número y fecha de oficio global de sentencia favorable SAT": "oficio_sentencia_sat",
+    "Publicación página SAT sentencia favorable": "publicacion_sat_sentencia",
+    "Número y fecha de oficio global de sentencia favorable DOF": "oficio_sentencia_dof",
+    "Publicación DOF sentencia favorable": "publicacion_dof_sentencia",
+}
+
+# ---------------------------------------------------------
+# Conexión a la base de datos
+# ---------------------------------------------------------
 
 def conectar_db():
     try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        return conn
+        return mysql.connector.connect(**DB_CONFIG)
     except Exception as e:
         print("❌ Error conectando a la base de datos:", e)
         exit(1)
 
-def cargar_csv(tabla, ruta_csv):
-    print(f"\n📄 Procesando: {ruta_csv} → Tabla: {tabla}")
+# ---------------------------------------------------------
+# Limpieza de fechas
+# ---------------------------------------------------------
 
+def parse_fecha(valor):
+    if pd.isna(valor):
+        return None
     try:
-        df = pd.read_csv(
-            ruta_csv,
-            skiprows=IMPORT_CONFIG['skip_rows'],
-            encoding='latin1',
-            on_bad_lines='skip'
-        )
+        return datetime.strptime(str(valor), "%d/%m/%Y").date()
+    except:
+        return None
 
+# ---------------------------------------------------------
+# Inserción en tabla
+# ---------------------------------------------------------
 
-        if df.empty:
-            print("⚠️ CSV vacío, se omite.")
-            return 0
-
-        conn = conectar_db()
-        cursor = conn.cursor(dictionary=True)
-
-        # Obtener columnas válidas de la tabla
-        cursor.execute(f"DESCRIBE {tabla}")
-        columnas_tabla = [col['Field'] for col in cursor.fetchall()]
-
-        # Filtrar columnas válidas
-        columnas_validas = [c for c in df.columns if c in columnas_tabla]
-
-        if not columnas_validas:
-            print("❌ Ninguna columna válida coincide con la tabla.")
-            return 0
-
-        df = df[columnas_validas]
-        df = df.where(pd.notnull(df), None)
-
-        placeholders = ", ".join(["%s"] * len(columnas_validas))
-        columnas_sql = ", ".join(columnas_validas)
-        query = f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})"
-
-        registros = df.values.tolist()
-
-        cursor.executemany(query, registros)
-        conn.commit()
-
-        total = cursor.rowcount
-
-        # Registrar en historial
-        cursor.execute("""
-            INSERT INTO Historial_Cargas (nombre_archivo, tabla, registros)
-            VALUES (%s, %s, %s)
-        """, (ruta_csv, tabla, total))
-        conn.commit()
-
-        cursor.close()
-        conn.close()
-
-        print(f"✅ {total} registros insertados en {tabla}")
-        return total
-
-    except Exception as e:
-        print("❌ Error procesando CSV:", e)
-        traceback.print_exc()
+def insertar_en_tabla(tabla, registros):
+    if not registros:
         return 0
+
+    conn = conectar_db()
+    cursor = conn.cursor()
+
+    columnas = registros[0].keys()
+    placeholders = ", ".join(["%s"] * len(columnas))
+    columnas_sql = ", ".join(columnas)
+
+    query = f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})"
+
+    valores = [tuple(r.values()) for r in registros]
+
+    cursor.executemany(query, valores)
+    conn.commit()
+
+    total = cursor.rowcount
+
+    cursor.close()
+    conn.close()
+
+    print(f"✅ Insertados {total} registros en {tabla}")
+    return total
+
+# ---------------------------------------------------------
+# Proceso principal
+# ---------------------------------------------------------
 
 def main():
     print("\n🚀 INICIALIZACIÓN DE BASE DE DATOS SAT")
     print("--------------------------------------")
 
-    total_global = 0
+    # Cargar CSV principal
+    df = pd.read_csv(
+        "data/Listado_Completo_69-B.csv",
+        encoding="latin1",
+        skiprows=2,
+        on_bad_lines="skip"
+    )
 
-    for tabla, ruta in CSV_FILES.items():
-        total = cargar_csv(tabla, ruta)
-        total_global += total
+    # Renombrar columnas
+    df = df.rename(columns=COLUMN_MAP)
+
+    # Limpiar columnas desconocidas
+    df = df[[c for c in df.columns if c in COLUMN_MAP.values()]]
+
+    # Limpiar fechas
+    for col in df.columns:
+        if "publicacion" in col:
+            df[col] = df[col].apply(parse_fecha)
+
+    # Convertir NaN → None
+    df = df.where(pd.notnull(df), None)
+
+    # Convertir a diccionarios
+    registros = df.to_dict(orient="records")
+
+    # Insertar en tabla completa
+    insertar_en_tabla("Listado_Completo_69_B", registros)
+
+    # Separar por tipo
+    tipos = {
+        "Definitivo": "Definitivos",
+        "Desvirtuado": "Desvirtuados",
+        "Presunto": "Presuntos",
+        "Sentencia Favorable": "SentenciasFavorables",
+    }
+
+    for tipo, tabla in tipos.items():
+        subset = [r for r in registros if r.get("situacion_contribuyente") == tipo]
+        insertar_en_tabla(tabla, subset)
 
     print("\n✅ PROCESO COMPLETADO")
-    print(f"📊 Total de registros insertados: {total_global}")
 
 if __name__ == "__main__":
     main()
