@@ -8,6 +8,11 @@ body {
     color: #333;
 }
 
+body.dark-mode {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
 h1, h2, h3, h4 {
     font-weight: 600;
     color: #2c3e50;
@@ -168,3 +173,4 @@ footer {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
