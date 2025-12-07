@@ -73,21 +73,33 @@ def parse_fecha(valor):
 # ---------------------------------------------------------
 # Inserción en tabla
 # ---------------------------------------------------------
-
 def insertar_en_tabla(tabla, registros):
     if not registros:
         return 0
 
     conn = conectar_db()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
-    columnas = registros[0].keys()
+    # Obtener columnas reales de la tabla
+    cursor.execute(f"DESCRIBE {tabla}")
+    columnas_tabla = [col["Field"] for col in cursor.fetchall()]
+
+    # Filtrar registros para incluir solo columnas válidas
+    registros_filtrados = []
+    for r in registros:
+        limpio = {k: v for k, v in r.items() if k in columnas_tabla}
+        registros_filtrados.append(limpio)
+
+    if not registros_filtrados:
+        print(f"⚠️ No hay columnas válidas para insertar en {tabla}")
+        return 0
+
+    columnas = registros_filtrados[0].keys()
     placeholders = ", ".join(["%s"] * len(columnas))
     columnas_sql = ", ".join(columnas)
 
     query = f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})"
-
-    valores = [tuple(r.values()) for r in registros]
+    valores = [tuple(r.values()) for r in registros_filtrados]
 
     cursor.executemany(query, valores)
     conn.commit()
@@ -99,6 +111,8 @@ def insertar_en_tabla(tabla, registros):
 
     print(f"✅ Insertados {total} registros en {tabla}")
     return total
+
+
 
 # ---------------------------------------------------------
 # Proceso principal
