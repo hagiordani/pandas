@@ -1,0 +1,133 @@
+/* ================================
+   DARK MODE — SISTEMA SAT
+================================ */
+
+body {
+    background-color: #1e1f22;
+    color: #e6e6e6;
+}
+
+h1, h2, h3, h4 {
+    color: #ffffff;
+}
+
+/* NAVBAR */
+.navbar {
+    background-color: #111214 !important;
+}
+
+.navbar-brand {
+    color: #ffffff !important;
+}
+
+.nav-link {
+    color: #cccccc !important;
+}
+
+.nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* CARDS */
+.card {
+    background-color: #2a2b2f;
+    color: #e6e6e6;
+    border: 1px solid #3a3b3f;
+}
+
+/* TABLAS */
+.table {
+    background-color: #2a2b2f;
+    color: #e6e6e6;
+}
+
+.table thead {
+    background-color: #3b3c40;
+    color: #ffffff;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #35363a;
+}
+
+/* FORMULARIOS */
+.form-control {
+    background-color: #2a2b2f;
+    color: #ffffff;
+    border: 1px solid #444;
+}
+
+.form-control:focus {
+    background-color: #2a2b2f;
+    color: #ffffff;
+    border-color: #6ea8fe;
+    box-shadow: 0 0 0 0.2rem rgba(110, 168, 254, 0.25);
+}
+
+.form-label {
+    color: #cccccc;
+}
+
+/* BOTONES */
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #bb2d3b;
+}
+
+.btn-success {
+    background-color: #198754;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #157347;
+}
+
+/* ALERTAS */
+.alert {
+    background-color: #2a2b2f;
+    border: 1px solid #444;
+    color: #e6e6e6;
+}
+
+/* FOOTER */
+footer {
+    background-color: #111214;
+    color: #888;
+    border-top: 1px solid #333;
+}
+
+/* PAGINACIÓN */
+.pagination .page-link {
+    background-color: #2a2b2f;
+    color: #ffffff;
+    border: 1px solid #444;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* ANIMACIONES */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
