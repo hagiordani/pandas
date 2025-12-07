@@ -516,6 +516,7 @@ def carga_csv():
 
     return render_template('carga_csv.html')
 
+
 @app.route('/historial_cargas')
 def historial_cargas():
     conn = get_db_connection()
@@ -528,6 +529,7 @@ def historial_cargas():
     conn.close()
 
     return render_template('historial_cargas.html', cargas=cargas)
+
 
 @app.route('/carga_masiva', methods=['GET', 'POST'])
 def carga_masiva():
