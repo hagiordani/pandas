@@ -5,22 +5,19 @@
 
 <div class="card">
   <h2>Subir archivo CSV</h2>
-  <p>Selecciona un archivo CSV para cargarlo en la base de datos.</p>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
   {% endwith %}
 
   <form method="POST" enctype="multipart/form-data">
     <label>Archivo CSV:</label>
     <input type="file" name="archivo" accept=".csv" required>
 
-    <label>Selecciona la tabla destino:</label>
-    <select name="tabla" required style="padding:10px;width:100%;margin-top:10px;">
+    <label>Tabla destino:</label>
+    <select name="tabla" required>
       <option value="">-- Seleccionar tabla --</option>
       <option value="Definitivos">Definitivos</option>
       <option value="Desvirtuados">Desvirtuados</option>
@@ -29,7 +26,7 @@
       <option value="Listado_Completo_69_B">Listado Completo 69-B</option>
     </select>
 
-    <button class="btn" type="submit">Cargar CSV</button>
+    <button class="btn">Cargar CSV</button>
   </form>
 </div>
 
