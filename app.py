@@ -26,15 +26,6 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # Extensión permitida para archivos de carga masiva
 ALLOWED_EXTENSIONS = {'txt'}
 
-@app.route('/')
-
-# hag def index():
-
-def index_page():
-    return render_template('index.html')
-
-
-
 def allowed_file(filename):
     """Verifica si la extensión del archivo es permitida"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
