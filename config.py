@@ -4,11 +4,12 @@ Configuración centralizada para el sistema SAT
 
 # Configuración de conexión a la base de datos
 DB_CONFIG = {
-    "host": "mysql-sat",
+    "host": "mariadb",
     "user": "satuser",
-    "password": "satpass",
+    "password": "satpass123",
     "database": "satdb"
 }
+
 
 # Rutas de archivos CSV - COMPLETO
 CSV_FILES = {
@@ -41,4 +42,5 @@ DB_SETTINGS = {
     'collation': 'utf8mb4_unicode_ci',
     'engine': 'InnoDB'
 }
+
 
