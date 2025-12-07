@@ -8,32 +8,11 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- CSS principal -->
     <link rel="stylesheet" href="/static/css/dashboard.css">
 
-    <link rel="stylesheet" href="/static/css/dark.css">
-
-
-
-    <style>
-        body {
-            background-color: #f5f6fa;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-        .card {
-            border-radius: 10px;
-        }
-        footer {
-            margin-top: 50px;
-            padding: 20px 0;
-            background: #fff;
-            border-top: 1px solid #ddd;
-            text-align: center;
-            color: #666;
-        }
-    </style>
+    <!-- NO cargar dark.css aquí -->
+    <!-- Se cargará dinámicamente con JS -->
 </head>
 
 <body>
@@ -51,38 +30,20 @@
 
             <ul class="navbar-nav ms-auto">
 
+                <!-- Toggle animado -->
                 <li class="nav-item d-flex align-items-center ms-3">
                     <label class="theme-switch">
-                         <input type="checkbox" id="themeToggle">
-                         <span class="slider"></span>
+                        <input type="checkbox" id="themeToggle">
+                        <span class="slider"></span>
                     </label>
-               </li>
-
-                
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/search">Buscar</a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/tablas">Tablas</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/estadisticas">Estadísticas</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/carga_csv">Carga CSV</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/carga_masiva">Carga TXT</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="/historial_cargas">Historial</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="/search">Buscar</a></li>
+                <li class="nav-item"><a class="nav-link" href="/tablas">Tablas</a></li>
+                <li class="nav-item"><a class="nav-link" href="/estadisticas">Estadísticas</a></li>
+                <li class="nav-item"><a class="nav-link" href="/carga_csv">Carga CSV</a></li>
+                <li class="nav-item"><a class="nav-link" href="/carga_masiva">Carga TXT</a></li>
+                <li class="nav-item"><a class="nav-link" href="/historial_cargas">Historial</a></li>
 
             </ul>
         </div>
@@ -103,82 +64,9 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<li class="nav-item">
-    <button id="themeToggle" class="btn btn-sm btn-light ms-3">
-        🌙 Modo oscuro
-    </button>
-</li>
-<script>
-    const toggleBtn = document.getElementById('themeToggle');
-
-    // Cargar preferencia guardada
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        toggleBtn.textContent = "☀️ Modo claro";
-        loadDarkCSS();
-    }
-
-    // Evento del botón
-    toggleBtn.addEventListener('click', () => {
-        if (document.body.classList.contains('dark-mode')) {
-            // Cambiar a modo claro
-            document.body.classList.remove('dark-mode');
-            toggleBtn.textContent = "🌙 Modo oscuro";
-            localStorage.setItem('theme', 'light');
-            removeDarkCSS();
-        } else {
-            // Cambiar a modo oscuro
-            document.body.classList.add('dark-mode');
-            toggleBtn.textContent = "☀️ Modo claro";
-            localStorage.setItem('theme', 'dark');
-            loadDarkCSS();
-        }
-    });
-
-    // Cargar CSS oscuro dinámicamente
-    function loadDarkCSS() {
-        if (!document.getElementById('darkCSS')) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = '/static/css/dark.css';
-            link.id = 'darkCSS';
-            document.head.appendChild(link);
-        }
-    }
-
-    // Remover CSS oscuro
-    function removeDarkCSS() {
-        const darkLink = document.getElementById('darkCSS');
-        if (darkLink) {
-            darkLink.remove();
-        }
-    }
-</script>
-
+<!-- SCRIPT ÚNICO Y CORRECTO DEL TOGGLE -->
 <script>
     const toggle = document.getElementById('themeToggle');
-
-    // Cargar preferencia guardada
-    const savedTheme = localStorage.getItem('theme') || 'light';
-
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        toggle.checked = true;
-        loadDarkCSS();
-    }
-
-    toggle.addEventListener('change', () => {
-        if (toggle.checked) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark');
-            loadDarkCSS();
-        } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem('theme', 'light');
-            removeDarkCSS();
-        }
-    });
 
     function loadDarkCSS() {
         if (!document.getElementById('darkCSS')) {
@@ -193,27 +81,6 @@
     function removeDarkCSS() {
         const darkLink = document.getElementById('darkCSS');
         if (darkLink) darkLink.remove();
-    }
-</script>
-
-<script>
-    const toggle = document.getElementById('themeToggle');
-
-    function loadDarkCSS() {
-        if (!document.getElementById('darkCSS')) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = '/static/css/dark.css';
-            link.id = 'darkCSS';
-            document.head.appendChild(link);
-        }
-    }
-
-    function removeDarkCSS() {
-        const darkLink = document.getElementById('darkCSS');
-        if (darkLink) {
-            darkLink.remove();
-        }
     }
 
     // Cargar preferencia guardada
@@ -243,6 +110,5 @@
     });
 </script>
 
-    
 </body>
 </html>
