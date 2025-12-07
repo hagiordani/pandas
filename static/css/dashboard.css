@@ -1,0 +1,170 @@
+/* ================================
+   ESTILOS GENERALES
+================================ */
+
+body {
+    background-color: #f5f6fa;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    color: #333;
+}
+
+h1, h2, h3, h4 {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* ================================
+   NAVBAR
+================================ */
+
+.navbar {
+    padding: 12px 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+.nav-link:hover {
+    opacity: 0.85;
+}
+
+/* ================================
+   TARJETAS / CARDS
+================================ */
+
+.card {
+    border-radius: 12px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+/* ================================
+   TABLAS
+================================ */
+
+.table {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead {
+    background: #007bff;
+    color: white;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f5ff;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+/* ================================
+   BOTONES
+================================ */
+
+.btn {
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+}
+
+.btn-danger {
+    border: none;
+}
+
+.btn-success {
+    border: none;
+}
+
+/* ================================
+   ALERTAS (FLASH MESSAGES)
+================================ */
+
+.alert {
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+/* ================================
+   FORMULARIOS
+================================ */
+
+.form-control {
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+/* ================================
+   FOOTER
+================================ */
+
+footer {
+    margin-top: 50px;
+    padding: 20px 0;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* ================================
+   PAGINACIÓN
+================================ */
+
+.pagination .page-link {
+    border-radius: 6px;
+    margin: 0 3px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+/* ================================
+   ANIMACIONES SUAVES
+================================ */
+
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
