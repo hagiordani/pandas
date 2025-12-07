@@ -502,9 +502,12 @@ def exportar_tabla(nombre_tabla):
 # CARGA MASIVA
 # ---------------------------------------------------------
 
-@app.route('/carga_masiva', methods=['GET', 'POST'])
-def carga_masiva():
+@app.route('/carga_csv', methods=['GET', 'POST'])
+def carga_csv():
+    """Carga archivos CSV a una tabla seleccionada"""
+
     if request.method == 'POST':
+        # Validar archivo
         if 'archivo' not in request.files:
             flash('No se seleccionó ningún archivo', 'danger')
             return redirect(request.url)
@@ -515,35 +518,74 @@ def carga_masiva():
             flash('No se seleccionó ningún archivo', 'danger')
             return redirect(request.url)
 
-        if not allowed_file(archivo.filename):
-            flash('Solo se permiten archivos .txt', 'danger')
+        if not archivo.filename.lower().endswith('.csv'):
+            flash('Solo se permiten archivos CSV', 'danger')
             return redirect(request.url)
 
-        nombre_reporte = request.form.get('nombre_reporte', '')
+        # Validar tabla destino
+        tabla = request.form.get('tabla')
+        tablas_validas = [
+            'Definitivos',
+            'Desvirtuados',
+            'Presuntos',
+            'SentenciasFavorables',
+            'Listado_Completo_69_B'
+        ]
+
+        if tabla not in tablas_validas:
+            flash('Tabla destino no válida', 'danger')
+            return redirect(request.url)
 
         try:
-            filename = secure_filename(archivo.filename)
-            temp_path = os.path.join(app.config['UPLOAD_FOLDER'], f"temp_{filename}")
-            archivo.save(temp_path)
+            # Leer CSV con pandas
+            df = pd.read_csv(archivo)
 
-            excel_path, stats, error = procesar_archivo_rfcs(temp_path, nombre_reporte)
-
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-
-            if error:
-                flash(f'Error procesando archivo: {error}', 'danger')
+            if df.empty:
+                flash('El archivo CSV está vacío', 'danger')
                 return redirect(request.url)
 
-            return send_file(
-                excel_path,
-                as_attachment=True,
-                download_name=f"reporte_rfcs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
+            # Obtener columnas de la tabla destino
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
 
-        except Exception as e:
-            flash(f'Error procesando el archivo: {str(e)}', 'danger')
+            cursor.execute(f"DESCRIBE {tabla}")
+            columnas_tabla = [col['Field'] for col in cursor.fetchall()]
+
+            # Validar columnas
+            columnas_validas = [c for c in df.columns if c in columnas_tabla]
+
+            if not columnas_validas:
+                flash('El CSV no contiene columnas válidas para esta tabla', 'danger')
+                return redirect(request.url)
+
+            # Filtrar solo columnas válidas
+            df = df[columnas_validas]
+
+            # Reemplazar NaN con None
+            df = df.where(pd.notnull(df), None)
+
+            # Inserción masiva
+            placeholders = ", ".join(["%s"] * len(columnas_validas))
+            columnas_sql = ", ".join(columnas_validas)
+            query = f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})"
+
+            registros = df.values.tolist()
+
+            cursor.executemany(query, registros)
+            conn.commit()
+
+            total = cursor.rowcount
+
+            cursor.close()
+            conn.close()
+
+            flash(f"✅ Se cargaron {total} registros correctamente en la tabla {tabla}", "success")
             return redirect(request.url)
 
-    return render_template('carga_masiva.html')
+        except Exception as e:
+            traceback.print_exc()
+            flash(f"Error procesando el archivo: {str(e)}", "danger")
+            return redirect(request.url)
+
+    return render_template('carga_csv.html')
+
