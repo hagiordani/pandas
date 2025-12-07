@@ -6,7 +6,7 @@ Configuración centralizada para el sistema SAT
 DB_CONFIG = {
     "host": "mysql-sat",
     "user": "satuser",
-    "password": "satpass123",
+    "password": "satpass",
     "database": "satdb"
 }
 
@@ -42,6 +42,7 @@ DB_SETTINGS = {
     'collation': 'utf8mb4_unicode_ci',
     'engine': 'InnoDB'
 }
+
 
 
 
