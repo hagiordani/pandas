@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Historial de Cargas</h1>
+
+<div class="card">
+  <h2>Últimas cargas realizadas</h2>
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Archivo</th>
+      <th>Tabla</th>
+      <th>Registros</th>
+      <th>Fecha</th>
+    </tr>
+
+    {% for carga in cargas %}
+    <tr>
+      <td>{{ carga.id }}</td>
+      <td>{{ carga.nombre_archivo }}</td>
+      <td>{{ carga.tabla }}</td>
+      <td>{{ carga.registros }}</td>
+      <td>{{ carga.fecha }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% endblock %}
