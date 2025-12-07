@@ -4,47 +4,35 @@
 <h1 class="mb-4">Dashboard General</h1>
 
 <!-- Tarjetas de estadísticas -->
-<div class="row g-4">
+<div class="row g-4 mb-4">
 
-    <!-- Total de registros -->
     <div class="col-md-3">
         <div class="card p-3 shadow-sm text-center">
-            <div class="display-6 text-primary mb-2">
-                <i class="bi bi-collection"></i>
-            </div>
+            <div class="display-6 text-primary mb-2"><i class="bi bi-collection"></i></div>
             <h5>Total de Registros</h5>
             <h2 class="fw-bold">{{ total_registros }}</h2>
         </div>
     </div>
 
-    <!-- Tablas disponibles -->
     <div class="col-md-3">
         <div class="card p-3 shadow-sm text-center">
-            <div class="display-6 text-success mb-2">
-                <i class="bi bi-table"></i>
-            </div>
+            <div class="display-6 text-success mb-2"><i class="bi bi-table"></i></div>
             <h5>Tablas Disponibles</h5>
             <h2 class="fw-bold">{{ total_tablas }}</h2>
         </div>
     </div>
 
-    <!-- Última carga -->
     <div class="col-md-3">
         <div class="card p-3 shadow-sm text-center">
-            <div class="display-6 text-warning mb-2">
-                <i class="bi bi-upload"></i>
-            </div>
+            <div class="display-6 text-warning mb-2"><i class="bi bi-upload"></i></div>
             <h5>Última Carga</h5>
             <h2 class="fw-bold">{{ ultima_carga }}</h2>
         </div>
     </div>
 
-    <!-- Registros procesados hoy -->
     <div class="col-md-3">
         <div class="card p-3 shadow-sm text-center">
-            <div class="display-6 text-danger mb-2">
-                <i class="bi bi-calendar-check"></i>
-            </div>
+            <div class="display-6 text-danger mb-2"><i class="bi bi-calendar-check"></i></div>
             <h5>Procesados Hoy</h5>
             <h2 class="fw-bold">{{ procesados_hoy }}</h2>
         </div>
@@ -52,61 +40,106 @@
 
 </div>
 
-<!-- Sección de accesos rápidos -->
-<h2 class="h4 mt-5 mb-3">Accesos Rápidos</h2>
-
+<!-- Gráficas -->
 <div class="row g-4">
 
-    <div class="col-md-4">
-        <a href="/search" class="text-decoration-none">
-            <div class="card p-4 shadow-sm h-100">
-                <h4 class="text-primary"><i class="bi bi-search"></i> Búsqueda</h4>
-                <p class="text-muted">Consulta contribuyentes por RFC o nombre.</p>
-            </div>
-        </a>
+    <!-- Gráfica de barras -->
+    <div class="col-md-6">
+        <div class="card p-4 shadow-sm">
+            <h4 class="mb-3">Registros por Tabla</h4>
+            <canvas id="barChart"></canvas>
+        </div>
     </div>
 
-    <div class="col-md-4">
-        <a href="/tablas" class="text-decoration-none">
-            <div class="card p-4 shadow-sm h-100">
-                <h4 class="text-success"><i class="bi bi-table"></i> Tablas</h4>
-                <p class="text-muted">Explora todas las tablas disponibles.</p>
-            </div>
-        </a>
-    </div>
-
-    <div class="col-md-4">
-        <a href="/carga_csv" class="text-decoration-none">
-            <div class="card p-4 shadow-sm h-100">
-                <h4 class="text-warning"><i class="bi bi-upload"></i> Carga CSV</h4>
-                <p class="text-muted">Sube archivos CSV para actualizar información.</p>
-            </div>
-        </a>
+    <!-- Gráfica de líneas -->
+    <div class="col-md-6">
+        <div class="card p-4 shadow-sm">
+            <h4 class="mb-3">Cargas por Día</h4>
+            <canvas id="lineChart"></canvas>
+        </div>
     </div>
 
 </div>
 
-<!-- Segunda fila -->
 <div class="row g-4 mt-1">
 
-    <div class="col-md-4">
-        <a href="/carga_masiva" class="text-decoration-none">
-            <div class="card p-4 shadow-sm h-100">
-                <h4 class="text-danger"><i class="bi bi-file-earmark-text"></i> Carga TXT</h4>
-                <p class="text-muted">Procesa archivos TXT con múltiples RFCs.</p>
-            </div>
-        </a>
-    </div>
-
-    <div class="col-md-4">
-        <a href="/historial_cargas" class="text-decoration-none">
-            <div class="card p-4 shadow-sm h-100">
-                <h4 class="text-info"><i class="bi bi-clock-history"></i> Historial</h4>
-                <p class="text-muted">Consulta el historial de cargas realizadas.</p>
-            </div>
-        </a>
+    <!-- Gráfica de pastel -->
+    <div class="col-md-6">
+        <div class="card p-4 shadow-sm">
+            <h4 class="mb-3">Distribución de Estados</h4>
+            <canvas id="pieChart"></canvas>
+        </div>
     </div>
 
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Datos dinámicos desde Flask
+    const tablas = {{ tablas_json | safe }};
+    const cargas_dias = {{ cargas_dias_json | safe }};
+    const estados = {{ estados_json | safe }};
+
+    // Colores compatibles con modo claro/oscuro
+    const textColor = document.body.classList.contains('dark-mode') ? '#fff' : '#000';
+
+    // Gráfica de barras
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: tablas.labels,
+            datasets: [{
+                label: 'Registros',
+                data: tablas.values,
+                backgroundColor: '#0d6efd'
+            }]
+        },
+        options: {
+            plugins: { legend: { labels: { color: textColor } } },
+            scales: {
+                x: { ticks: { color: textColor } },
+                y: { ticks: { color: textColor } }
+            }
+        }
+    });
+
+    // Gráfica de líneas
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: cargas_dias.labels,
+            datasets: [{
+                label: 'Cargas',
+                data: cargas_dias.values,
+                borderColor: '#198754',
+                tension: 0.3
+            }]
+        },
+        options: {
+            plugins: { legend: { labels: { color: textColor } } },
+            scales: {
+                x: { ticks: { color: textColor } },
+                y: { ticks: { color: textColor } }
+            }
+        }
+    });
+
+    // Gráfica de pastel
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: estados.labels,
+            datasets: [{
+                data: estados.values,
+                backgroundColor: ['#0d6efd', '#198754', '#dc3545', '#ffc107', '#6f42c1']
+            }]
+        },
+        options: {
+            plugins: { legend: { labels: { color: textColor } } }
+        }
+    });
+</script>
 
 {% endblock %}
