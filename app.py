@@ -161,61 +161,6 @@ def buscar_rfc_en_tablas(rfc, cursor):
 # DASHBOARD PRINCIPAL
 # ---------------------------------------------------------
 
-@app.route('/')
-def index():
-    conn = get_db_connection()
-    if not conn:
-        return "Error de conexión a la base de datos", 500
-
-    cursor = conn.cursor(dictionary=True)
-
-    try:
-        tablas = ['Definitivos', 'Desvirtuados', 'Presuntos', 'SentenciasFavorables', 'Listado_Completo_69_B']
-
-        # Estadísticas generales
-        stats = {}
-        for tabla in tablas:
-            cursor.execute(f"SELECT COUNT(*) AS count FROM {tabla}")
-            stats[tabla] = cursor.fetchone()['count']
-        stats['total'] = sum(stats.values())
-
-        # Situaciones
-        cursor.execute("""
-            SELECT situacion_contribuyente, COUNT(*) AS count
-            FROM Listado_Completo_69_B
-            GROUP BY situacion_contribuyente
-            ORDER BY count DESC
-        """)
-        situaciones = cursor.fetchall()
-
-        # Últimas actualizaciones
-        cursor.execute("""
-            SELECT table_name, fecha_actualizacion
-            FROM (
-                SELECT 'Definitivos' AS table_name, MAX(fecha_actualizacion) AS fecha_actualizacion FROM Definitivos
-                UNION SELECT 'Desvirtuados', MAX(fecha_actualizacion) FROM Desvirtuados
-                UNION SELECT 'Presuntos', MAX(fecha_actualizacion) FROM Presuntos
-                UNION SELECT 'SentenciasFavorables', MAX(fecha_actualizacion) FROM SentenciasFavorables
-                UNION SELECT 'Listado_Completo_69_B', MAX(fecha_actualizacion) FROM Listado_Completo_69_B
-            ) AS updates
-            ORDER BY fecha_actualizacion DESC
-        """)
-        actualizaciones = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
-
-        return render_template(
-            'index.html',
-            stats=stats,
-            situaciones=situaciones,
-            actualizaciones=actualizaciones
-        )
-
-    except Exception as e:
-        cursor.close()
-        conn.close()
-        return f"Error: {e}", 500
 
 # ---------------------------------------------------------
 # BÚSQUEDA
