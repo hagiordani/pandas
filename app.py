@@ -34,31 +34,100 @@ ALLOWED_EXTENSIONS = {'txt'}
 
 @app.route("/")
 def index():
-    tablas = {
-        "labels": ["Definitivos", "Presuntos", "Desvirtuados"],
-        "values": [1200, 800, 450]
-    }
+    conn = get_db_connection()
+    if not conn:
+        return "Error de conexión a la base de datos", 500
 
-    cargas_dias = {
-        "labels": ["Lun", "Mar", "Mié", "Jue", "Vie"],
-        "values": [10, 25, 18, 30, 22]
-    }
+    cursor = conn.cursor(dictionary=True)
 
-    estados = {
-        "labels": ["Activo", "Suspendido", "Baja"],
-        "values": [70, 20, 10]
-    }
+    try:
+        tablas = ['Definitivos', 'Desvirtuados', 'Presuntos', 'SentenciasFavorables', 'Listado_Completo_69_B']
 
-    return render_template(
-        "index.html",
-        total_registros=2450,
-        total_tablas=5,
-        ultima_carga="2025-01-12",
-        procesados_hoy=32,
-        tablas_json=json.dumps(tablas),
-        cargas_dias_json=json.dumps(cargas_dias),
-        estados_json=json.dumps(estados)
-    )
+        # ============================
+        # 1. Total de registros por tabla (para gráfica de barras)
+        # ============================
+        registros_por_tabla = {}
+        for tabla in tablas:
+            cursor.execute(f"SELECT COUNT(*) AS count FROM {tabla}")
+            registros_por_tabla[tabla] = cursor.fetchone()['count']
+
+        tablas_json = {
+            "labels": list(registros_por_tabla.keys()),
+            "values": list(registros_por_tabla.values())
+        }
+
+        # ============================
+        # 2. Cargas por día (para gráfica de líneas)
+        # ============================
+        cursor.execute("""
+            SELECT DATE(fecha) AS dia, COUNT(*) AS total
+            FROM Historial_Cargas
+            GROUP BY DATE(fecha)
+            ORDER BY dia DESC
+            LIMIT 7
+        """)
+        cargas = cursor.fetchall()
+
+        cargas_dias_json = {
+            "labels": [str(c["dia"]) for c in cargas][::-1],
+            "values": [c["total"] for c in cargas][::-1]
+        }
+
+        # ============================
+        # 3. Situaciones (para gráfica de pastel)
+        # ============================
+        cursor.execute("""
+            SELECT situacion_contribuyente AS situacion, COUNT(*) AS total
+            FROM Listado_Completo_69_B
+            GROUP BY situacion_contribuyente
+            ORDER BY total DESC
+        """)
+        situaciones = cursor.fetchall()
+
+        estados_json = {
+            "labels": [s["situacion"] for s in situaciones],
+            "values": [s["total"] for s in situaciones]
+        }
+
+        # ============================
+        # 4. Estadísticas generales
+        # ============================
+        total_registros = sum(registros_por_tabla.values())
+        total_tablas = len(tablas)
+
+        cursor.execute("SELECT fecha FROM Historial_Cargas ORDER BY fecha DESC LIMIT 1")
+        ultima = cursor.fetchone()
+        ultima_carga = ultima["fecha"] if ultima else "N/A"
+
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM Historial_Cargas
+            WHERE DATE(fecha) = CURDATE()
+        """)
+        procesados_hoy = cursor.fetchone()["total"]
+
+        cursor.close()
+        conn.close()
+
+        # ============================
+        # Renderizar dashboard
+        # ============================
+        return render_template(
+            "index.html",
+            total_registros=total_registros,
+            total_tablas=total_tablas,
+            ultima_carga=ultima_carga,
+            procesados_hoy=procesados_hoy,
+            tablas_json=json.dumps(tablas_json),
+            cargas_dias_json=json.dumps(cargas_dias_json),
+            estados_json=json.dumps(estados_json)
+        )
+
+    except Exception as e:
+        cursor.close()
+        conn.close()
+        return f"Error: {e}", 500
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
